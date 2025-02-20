@@ -74,7 +74,7 @@ class _BodyLoginWidgetState extends State<BodyLoginWidget> {
             TextField(
               decoration: InputDecoration(
                 labelText: "email:",
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.email),
                 hintText: "Escriba su email",
               ),
               keyboardType: TextInputType.emailAddress,
