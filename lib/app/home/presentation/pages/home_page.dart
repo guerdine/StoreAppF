@@ -35,7 +35,6 @@ class ProductsListWidget extends StatefulWidget {
   @override
   State<ProductsListWidget> createState()=> _ProductListWidgetState();
   
-
 }
 
 class _ProductListWidgetState extends State<ProductsListWidget> {
@@ -45,7 +44,6 @@ class _ProductListWidgetState extends State<ProductsListWidget> {
     final bloc = context.read<HomeBloc>();
     bloc.add(GetProductsEvent());
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -109,24 +107,48 @@ class ProductItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Row(
-        children: [
-          Image.network(
-            product.urlImage,
-            width: 150.0,
-            fit: BoxFit.contain,
+    final bloc = context.read<HomeBloc>();
+    return InkWell(
+      onLongPress: 
+      () => showDialog(
+            context: context,
+            builder:
+                (BuildContext context) => AlertDialog(
+                  title: const Text('Eliminar de articulo'),
+                  content: Text("Está seguro de eliminar este articulo"),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context, 'OK');
+                      },
+                      child: const Text('OK'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancelar'),
+                      child: const Text('Cancelar'),
+                    ),
+                  ],
+                ),
           ),
-          Expanded(
-            child: SizedBox(
-              height: 150,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [Text(product.name), Text("\$${product.price}")],
+      child: Card(
+        child: Row(
+          children: [
+            Image.network(
+              product.urlImage,
+              width: 150.0,
+              fit: BoxFit.contain,
+            ),
+            Expanded(
+              child: SizedBox(
+                height: 150,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [Text(product.name), Text("\$${product.price}")],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
