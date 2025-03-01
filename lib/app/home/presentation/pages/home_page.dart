@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:storeapp/app/di/dependency_injection.dart';
 import 'package:storeapp/app/home/presentation/bloc/home_bloc.dart';
 import 'package:storeapp/app/home/presentation/bloc/home_event.dart';
@@ -21,9 +22,16 @@ class HomePage extends StatelessWidget {
               "Listado de productos",
               style: TextStyle(color: Colors.white),
             ),
-            actions: [SizedBox(width: 16.0), Icon(Icons.logout)],
+            actions: [
+              Icon(Icons.logout, color: Colors.white),
+              SizedBox(width: 16.0),
+            ],
           ),
           body: ProductsListWidget(),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => GoRouter.of(context).pushNamed("form-product"),
+            child: Icon(Icons.add),
+          ),
         ),
       ),
     );
@@ -37,12 +45,6 @@ class ProductsListWidget extends StatefulWidget {
 }
 
 class _ProductListWidgetState extends State<ProductsListWidget> {
-  @override
-  void initState() {
-    super.initState();
-    final bloc = context.read<HomeBloc>();
-  }
-
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<HomeBloc>();
@@ -79,6 +81,7 @@ class _ProductListWidgetState extends State<ProductsListWidget> {
           case LoadingState():
             return Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 20.0),
@@ -112,18 +115,22 @@ class ProductItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<HomeBloc>();
     return InkWell(
+      onTap:
+          () => GoRouter.of(
+            context,
+          ).pushNamed("form-product-u", pathParameters: {"id": product.id}),
       onLongPress:
           () => showDialog(
             context: context,
             builder:
-                (dialogContext) => AlertDialog(
+                (BuildContext context) => AlertDialog(
                   title: const Text("Eliminación de producto"),
                   content: Text("¿Está seguro de eliminar: ${product.name}?"),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
                         Navigator.pop(
-                          dialogContext,
+                          context,
                           'OK',
                         ); // Usa dialogContext en lugar de context
                         bloc.add(DeleteProductEvent(id: product.id));
@@ -131,7 +138,7 @@ class ProductItemWidget extends StatelessWidget {
                       child: const Text("OK"),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(dialogContext, "Cancelar"),
+                      onPressed: () => Navigator.pop(context, "Cancelar"),
                       child: const Text("Cancelar"),
                     ),
                   ],

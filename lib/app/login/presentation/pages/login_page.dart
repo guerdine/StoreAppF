@@ -67,7 +67,7 @@ class FooterLoginWidget extends StatelessWidget {
 }
 
 class BodyLoginWidget extends StatefulWidget {
-  BodyLoginWidget({super.key});
+  const BodyLoginWidget({super.key});
 
   @override
   State<BodyLoginWidget> createState() => _BodyLoginWidgetState();
@@ -106,8 +106,7 @@ class _BodyLoginWidgetState extends State<BodyLoginWidget> with LoginMixin {
                   ),
             );
             break;
-          default:
-        }
+          }
       },
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {

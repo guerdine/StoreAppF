@@ -1,4 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:storeapp/app/core/data/remote/service/product_service.dart';
+import 'package:storeapp/app/form_product/data/repository/form_product_repository_impl.dart';
+import 'package:storeapp/app/form_product/domain/repository/form_product_repository.dart';
+import 'package:storeapp/app/form_product/domain/use_case/add_product_use_case.dart';
+import 'package:storeapp/app/form_product/domain/use_case/get_product_use_case.dart';
+import 'package:storeapp/app/form_product/presentation/bloc/form_product_bloc.dart';
 import 'package:storeapp/app/home/data/repository/home_repository_impl.dart';
 import 'package:storeapp/app/home/domain/repository/home_repository.dart';
 import 'package:storeapp/app/home/domain/use_case/delete_products_use_case.dart';
@@ -15,6 +22,12 @@ final class DependencyInjection {
   static final serviceLocator = GetIt.instance;
 
   static setup() {
+    //dio
+    serviceLocator.registerSingleton<Dio>(Dio());
+    serviceLocator.registerFactory<ProductService>(
+      () => ProductService(dio: serviceLocator.get()),
+    );
+
     //login
     serviceLocator.registerFactory<LoginRepository>(
       () => LoginRepositoryImpl(),
@@ -27,7 +40,9 @@ final class DependencyInjection {
     );
 
     //home
-    serviceLocator.registerFactory<HomeRepository>(() => HomeRepositoryImpl());
+    serviceLocator.registerFactory<HomeRepository>(
+      () => HomeRepositoryImpl(productService: serviceLocator.get()),
+    );
     serviceLocator.registerFactory<GetProductsUseCase>(
       () => GetProductsUseCase(homeRepository: serviceLocator.get()),
     );
@@ -39,6 +54,20 @@ final class DependencyInjection {
         getProductsUseCase: serviceLocator.get(),
         deleteProductsUseCase: serviceLocator.get(),
       ),
+    );
+
+    //addproduct
+    serviceLocator.registerFactory<FormProductRepository>(
+      () => FormProductRepositoryImpl(productService: serviceLocator.get()),
+    );
+    serviceLocator.registerFactory<AddProductUseCase>(
+      () => AddProductUseCase(formProductRepository: serviceLocator.get()),
+    );
+    serviceLocator.registerFactory<GetProductUseCase>(
+      () => GetProductUseCase(formProductRepository: serviceLocator.get()),
+    );
+    serviceLocator.registerFactory<FormProductBloc>(
+      () => FormProductBloc(addProductUseCase: serviceLocator.get(),getProductUseCase : serviceLocator.get()),
     );
   }
 }

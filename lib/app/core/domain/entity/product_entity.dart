@@ -1,3 +1,4 @@
+import 'package:storeapp/app/core/data/remote/dto/product_data_model.dart';
 import 'package:storeapp/app/home/presentation/model/product_model.dart';
 
 final class ProductEntity {
@@ -14,12 +15,10 @@ final class ProductEntity {
   });
 
   ProductModel toProductModel() {
-    return ProductModel(
-      id: id,
-      name: name,
-      urlImage:
-          "https://cdn3d.iconscout.com/3d/premium/thumb/producto-5806313-4863042.png",
-      price: price,
-    );
+    return ProductModel(id: id, name: name, urlImage: image, price: price);
+  }
+
+  ProductDataModel toProductDataModel() {
+    return ProductDataModel(id: id, name: name, price: price, imageURL: image);
   }
 }
