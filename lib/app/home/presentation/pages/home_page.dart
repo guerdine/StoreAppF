@@ -33,8 +33,7 @@ class HomePage extends StatelessWidget {
 class ProductsListWidget extends StatefulWidget {
   const ProductsListWidget({super.key});
   @override
-  State<ProductsListWidget> createState()=> _ProductListWidgetState();
-  
+  State<ProductsListWidget> createState() => _ProductListWidgetState();
 }
 
 class _ProductListWidgetState extends State<ProductsListWidget> {
@@ -42,12 +41,12 @@ class _ProductListWidgetState extends State<ProductsListWidget> {
   void initState() {
     super.initState();
     final bloc = context.read<HomeBloc>();
-    bloc.add(GetProductsEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<HomeBloc>();
+    bloc.add(GetProductsEvent());
     return BlocConsumer<HomeBloc, HomeState>(
       //es listener y builder a la vez
       listener: (context, state) {
@@ -63,7 +62,10 @@ class _ProductListWidgetState extends State<ProductsListWidget> {
                     content: Text(state.message),
                     actions: <Widget>[
                       TextButton(
-                        onPressed: () => Navigator.pop(context, 'OK'),
+                        onPressed: () {
+                          Navigator.pop(context, 'OK');
+                          bloc.add(GetProductsEvent());
+                        },
                         child: const Text('OK'),
                       ),
                     ],
@@ -89,8 +91,9 @@ class _ProductListWidgetState extends State<ProductsListWidget> {
           case LoadDataState():
             return ListView.builder(
               itemCount: state.model.products.length,
-              itemBuilder: (context, index) => 
-                ProductItemWidget(state.model.products[index]),
+              itemBuilder:
+                  (context, index) =>
+                      ProductItemWidget(state.model.products[index]),
             );
           default:
             return Container();
@@ -103,29 +106,33 @@ class _ProductListWidgetState extends State<ProductsListWidget> {
 class ProductItemWidget extends StatelessWidget {
   final ProductModel product;
 
-  const ProductItemWidget(this.product,{super.key});
+  const ProductItemWidget(this.product, {super.key});
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<HomeBloc>();
     return InkWell(
-      onLongPress: 
-      () => showDialog(
+      onLongPress:
+          () => showDialog(
             context: context,
             builder:
-                (BuildContext context) => AlertDialog(
-                  title: const Text('Eliminar de articulo'),
-                  content: Text("Está seguro de eliminar este articulo"),
+                (dialogContext) => AlertDialog(
+                  title: const Text("Eliminación de producto"),
+                  content: Text("¿Está seguro de eliminar: ${product.name}?"),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context, 'OK');
+                        Navigator.pop(
+                          dialogContext,
+                          'OK',
+                        ); // Usa dialogContext en lugar de context
+                        bloc.add(DeleteProductEvent(id: product.id));
                       },
-                      child: const Text('OK'),
+                      child: const Text("OK"),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(context, 'Cancelar'),
-                      child: const Text('Cancelar'),
+                      onPressed: () => Navigator.pop(dialogContext, "Cancelar"),
+                      child: const Text("Cancelar"),
                     ),
                   ],
                 ),
@@ -133,11 +140,7 @@ class ProductItemWidget extends StatelessWidget {
       child: Card(
         child: Row(
           children: [
-            Image.network(
-              product.urlImage,
-              width: 150.0,
-              fit: BoxFit.contain,
-            ),
+            Image.network(product.urlImage, width: 150.0, fit: BoxFit.contain),
             Expanded(
               child: SizedBox(
                 height: 150,
