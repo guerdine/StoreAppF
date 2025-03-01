@@ -6,7 +6,7 @@ import 'package:storeapp/app/login/domain/repository/login_repository.dart';
 class LoginRepositoryImpl implements LoginRepository{
   @override
   bool login(LoginEntity loginEntity) {
-    return Random().nextBool();
+    return true;//Random().nextBool();//aqui si la cambio a true siempre hara login 
   }
 
 }

@@ -4,14 +4,15 @@ import 'package:storeapp/app/login/domain/repository/login_repository.dart';
 import 'package:storeapp/app/login/presentation/model/login_form_model.dart';
 
 class LoginUseCase {
-  late final LoginRepository _loginRepository;
+  final LoginRepository loginRepository;
   
-  LoginUseCase() {
-    _loginRepository = LoginRepositoryImpl();
-  }
+  LoginUseCase({required this.loginRepository}) ;
+  
   
   bool invoke(LoginFormModel loginFormModel) {
     final LoginEntity data = loginFormModel.toEntity();
-    return _loginRepository.login(data);
+
+    return loginRepository.login(data);
   }
+
 }

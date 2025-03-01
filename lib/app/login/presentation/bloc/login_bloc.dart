@@ -6,14 +6,12 @@ import 'package:storeapp/app/login/presentation/bloc/login_event.dart';
 import 'package:storeapp/app/login/presentation/bloc/login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent,LoginState>{
-late final LoginUseCase _loginUseCase; 
+final LoginUseCase loginUseCase; 
 
-  LoginBloc(): super((InitialState())){
+  LoginBloc({required this.loginUseCase}): super((InitialState())){
     on<EmailChangedEvent>(_emailChangedEvent);
     on<PasswordChangedEvent>(_passwordChangedEvent);
     on<SubmitEvent>(_submitEvent);
-
-    _loginUseCase = LoginUseCase();
   }
 
   FutureOr<void> _emailChangedEvent(EmailChangedEvent event, Emitter<LoginState> emit) {
@@ -29,7 +27,7 @@ late final LoginUseCase _loginUseCase;
   }
 
   FutureOr<void> _submitEvent(SubmitEvent event, Emitter<LoginState> emit) {
-    final bool result = _loginUseCase.invoke(state.model);
+    final bool result = loginUseCase.invoke(state.model);
     late final LoginState newState;
     if(result){
       newState = LoginSuccessState(model: state.model);

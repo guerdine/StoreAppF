@@ -1,62 +1,132 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:storeapp/app/di/dependency_injection.dart';
+import 'package:storeapp/app/home/presentation/bloc/home_bloc.dart';
+import 'package:storeapp/app/home/presentation/bloc/home_event.dart';
+import 'package:storeapp/app/home/presentation/bloc/home_state.dart';
+import 'package:storeapp/app/home/presentation/model/product_model.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          HomePageHeaderWidget(),
-          Container(
-            margin: EdgeInsets.only(right: 32.0, left: 32.0, top: 30.0),
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    //onPressed: () => context.pop(), ambos son validos
-                    onPressed: () => GoRouter.of(context).pushReplacementNamed("login"),
-                    child: SizedBox(
-                      child: Text(
-                        "Cerrar sesion",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    return SafeArea(
+      child: BlocProvider.value(
+        value: DependencyInjection.serviceLocator.get<HomeBloc>(),
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.purple,
+            title: Text(
+              "Listado de productos",
+              style: TextStyle(color: Colors.white),
             ),
+            actions: [SizedBox(width: 16.0), Icon(Icons.logout)],
           ),
-        ],
+          body: ProductsListWidget(),
+        ),
       ),
     );
   }
 }
 
-class HomePageHeaderWidget extends StatelessWidget {
-  const HomePageHeaderWidget({super.key});
+class ProductsListWidget extends StatefulWidget {
+  const ProductsListWidget({super.key});
+  @override
+  State<ProductsListWidget> createState()=> _ProductListWidgetState();
+  
+
+}
+
+class _ProductListWidgetState extends State<ProductsListWidget> {
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<HomeBloc>();
+    bloc.add(GetProductsEvent());
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(
-          right: 32.0,
-          left: 32.0,
-          top: 10.0,
-        ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    final bloc = context.read<HomeBloc>();
+    return BlocConsumer<HomeBloc, HomeState>(
+      //es listener y builder a la vez
+      listener: (context, state) {
+        switch (state) {
+          case LoadingState() || EmptyState() || LoadDataState():
+            break;
+          case HomeErrorState():
+            showDialog(
+              context: context,
+              builder:
+                  (BuildContext context) => AlertDialog(
+                    title: const Text('Error'),
+                    content: Text(state.message),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'OK'),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+            );
+            break;
+        }
+      },
+      builder: (context, state) {
+        switch (state) {
+          case LoadingState():
+            return Center(
+              child: Column(
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20.0),
+                  Text(state.message),
+                ],
+              ),
+            );
+          case EmptyState():
+            return Center(child: Text("No se han encontrado los productos"));
+          case LoadDataState():
+            return ListView.builder(
+              itemCount: state.model.products.length,
+              itemBuilder: (context, index) => 
+                ProductItemWidget(state.model.products[index]),
+            );
+          default:
+            return Container();
+        }
+      },
+    );
+  }
+}
+
+class ProductItemWidget extends StatelessWidget {
+  final ProductModel product;
+
+  const ProductItemWidget(this.product,{super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Row(
         children: [
           Image.network(
-            "https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
-            width: double.infinity,
-            height: 100.0,
+            product.urlImage,
+            width: 150.0,
             fit: BoxFit.contain,
           ),
-          Text("Pagina principal", style: TextStyle(fontSize: 48.0))],
+          Expanded(
+            child: SizedBox(
+              height: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [Text(product.name), Text("\$${product.price}")],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
