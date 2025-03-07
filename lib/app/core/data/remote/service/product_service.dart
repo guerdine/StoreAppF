@@ -50,9 +50,7 @@ final class ProductService {
       final Response<Map<String, dynamic>> response = await dio.get("$_baseURL/products/$id.json");
 
       if (response.data != null) {
-        response.data?.forEach((key, value) {
           product = ProductDataModel.fromJson(id, response.data!);
-        });
       }
     } catch (e) {
       throw (Exception(e));

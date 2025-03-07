@@ -48,14 +48,14 @@ class AppBarWidget extends StatelessWidget {
           onTap: () => showDialog(
             context: context,
             builder:
-                (BuildContext context) => AlertDialog(
+                (dialogContext) => AlertDialog(
                   title: const Text("Cerrar sesion"),
                   content: Text("¿Está seguro de cerrar la sesion?"),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
                         Navigator.pop(
-                          context,
+                          dialogContext,
                           'OK',
                         ); // Usa dialogContext en lugar de context
                         bloc.add(LogoutEvent());
@@ -63,7 +63,7 @@ class AppBarWidget extends StatelessWidget {
                       child: const Text("OK"),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(context, "Cancelar"),
+                      onPressed: () => Navigator.pop(dialogContext, "Cancelar"),
                       child: const Text("Cancelar"),
                     ),
                   ],
@@ -163,14 +163,14 @@ class ProductItemWidget extends StatelessWidget {
           () => showDialog(
             context: context,
             builder:
-                (BuildContext context) => AlertDialog(
+                (dialogContext) => AlertDialog(
                   title: const Text("Eliminación de producto"),
                   content: Text("¿Está seguro de eliminar: ${product.name}?"),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
                         Navigator.pop(
-                          context,
+                          dialogContext,
                           'OK',
                         ); // Usa dialogContext en lugar de context
                         bloc.add(DeleteProductEvent(id: product.id));
@@ -178,7 +178,7 @@ class ProductItemWidget extends StatelessWidget {
                       child: const Text("OK"),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.pop(context, "Cancelar"),
+                      onPressed: () => Navigator.pop(dialogContext, "Cancelar"),
                       child: const Text("Cancelar"),
                     ),
                   ],
