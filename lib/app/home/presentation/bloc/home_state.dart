@@ -25,3 +25,8 @@ final class HomeErrorState extends HomeState {
   HomeErrorState({required super.model, required this.message});
   final String message;
 }
+
+final class LogoutState extends HomeState {
+  LogoutState()
+    : super(model: HomeModel(products: [])); //estado inicial sin productos
+}

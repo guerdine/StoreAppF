@@ -26,8 +26,8 @@ final LoginUseCase loginUseCase;
     emit(newState);
   }
 
-  FutureOr<void> _submitEvent(SubmitEvent event, Emitter<LoginState> emit) {
-    final bool result = loginUseCase.invoke(state.model);
+  FutureOr<void> _submitEvent(SubmitEvent event, Emitter<LoginState> emit) async {
+    final bool result = await loginUseCase.invoke(state.model);
     late final LoginState newState;
     if(result){
       newState = LoginSuccessState(model: state.model);

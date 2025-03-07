@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "145036666215",
+    "firebase_url": "https://storeapp-77c7c-default-rtdb.firebaseio.com",
+    "project_id": "storeapp-77c7c",
+    "storage_bucket": "storeapp-77c7c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145036666215:android:01d079bf40eaa191febbc2",
+        "android_client_info": {
+          "package_name": "co.edu.unab.damo.dine.storeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2g_i-xa-Me118cmi_JSVna35Virc0AGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

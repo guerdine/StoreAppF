@@ -16,16 +16,9 @@ class HomePage extends StatelessWidget {
       child: BlocProvider.value(
         value: DependencyInjection.serviceLocator.get<HomeBloc>(),
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.purple,
-            title: Text(
-              "Listado de productos",
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: [
-              Icon(Icons.logout, color: Colors.white),
-              SizedBox(width: 16.0),
-            ],
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(60.0),
+            child: AppBarWidget(),
           ),
           body: ProductsListWidget(),
           floatingActionButton: FloatingActionButton(
@@ -34,6 +27,51 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class AppBarWidget extends StatelessWidget {
+  const AppBarWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.read<HomeBloc>();
+    return AppBar(
+      backgroundColor: Colors.orange[300],
+      title: Text(
+        "Listado de productos",
+        style: TextStyle(color: Colors.white),
+      ),
+      actions: [
+        InkWell(
+          onTap: () => showDialog(
+            context: context,
+            builder:
+                (BuildContext context) => AlertDialog(
+                  title: const Text("Cerrar sesion"),
+                  content: Text("¿Está seguro de cerrar la sesion?"),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(
+                          context,
+                          'OK',
+                        ); // Usa dialogContext en lugar de context
+                        bloc.add(LogoutEvent());
+                      },
+                      child: const Text("OK"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, "Cancelar"),
+                      child: const Text("Cancelar"),
+                    ),
+                  ],
+                ),
+          ),
+          child: Icon(Icons.logout, color: Colors.white)),
+        SizedBox(width: 16.0),
+      ],
     );
   }
 }
@@ -74,6 +112,8 @@ class _ProductListWidgetState extends State<ProductsListWidget> {
                   ),
             );
             break;
+          case LogoutState():
+            GoRouter.of(context).goNamed("login");
         }
       },
       builder: (context, state) {

@@ -4,6 +4,7 @@ import 'package:storeapp/app/main_app.dart';
 
 void main() {
   DependencyInjection.setup();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MainApp());
 }
 

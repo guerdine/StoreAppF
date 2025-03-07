@@ -24,3 +24,8 @@ final class GetProductEvent extends FormProductEvent{
   final String id;
   GetProductEvent(this.id);
 }
+
+final class UpdateProductEvent extends FormProductEvent{
+  final String id;
+  UpdateProductEvent(this.id);
+}

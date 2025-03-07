@@ -1,10 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storeapp/app/core/data/remote/service/product_service.dart';
+import 'package:storeapp/app/core/data/repository/session_repository_impl.dart';
+import 'package:storeapp/app/core/domain/repository/session_repository.dart';
+import 'package:storeapp/app/core/domain/use_case/logout_use_case.dart';
 import 'package:storeapp/app/form_product/data/repository/form_product_repository_impl.dart';
 import 'package:storeapp/app/form_product/domain/repository/form_product_repository.dart';
 import 'package:storeapp/app/form_product/domain/use_case/add_product_use_case.dart';
 import 'package:storeapp/app/form_product/domain/use_case/get_product_use_case.dart';
+import 'package:storeapp/app/form_product/domain/use_case/update_product_use_case.dart';
 import 'package:storeapp/app/form_product/presentation/bloc/form_product_bloc.dart';
 import 'package:storeapp/app/home/data/repository/home_repository_impl.dart';
 import 'package:storeapp/app/home/domain/repository/home_repository.dart';
@@ -43,16 +47,26 @@ final class DependencyInjection {
     serviceLocator.registerFactory<HomeRepository>(
       () => HomeRepositoryImpl(productService: serviceLocator.get()),
     );
+
+    serviceLocator.registerFactory<SessionRepository>(
+      () => SessionRepositoryImpl());
+    serviceLocator.registerFactory<LogoutUseCase>(
+      () => LogoutUseCase(sessionRepository: serviceLocator.get()),
+    );
+
+
     serviceLocator.registerFactory<GetProductsUseCase>(
       () => GetProductsUseCase(homeRepository: serviceLocator.get()),
     );
     serviceLocator.registerFactory<DeleteProductsUseCase>(
       () => DeleteProductsUseCase(homeRepository: serviceLocator.get()),
     );
+    
     serviceLocator.registerFactory<HomeBloc>(
       () => HomeBloc(
         getProductsUseCase: serviceLocator.get(),
         deleteProductsUseCase: serviceLocator.get(),
+        logoutUseCase: serviceLocator.get(),
       ),
     );
 
@@ -66,8 +80,16 @@ final class DependencyInjection {
     serviceLocator.registerFactory<GetProductUseCase>(
       () => GetProductUseCase(formProductRepository: serviceLocator.get()),
     );
+    serviceLocator.registerFactory<UpdateProductUseCase>(
+      () => UpdateProductUseCase(formProductRepository: serviceLocator.get()),
+    );
+
     serviceLocator.registerFactory<FormProductBloc>(
-      () => FormProductBloc(addProductUseCase: serviceLocator.get(),getProductUseCase : serviceLocator.get()),
+      () => FormProductBloc(
+        addProductUseCase: serviceLocator.get(),
+        getProductUseCase: serviceLocator.get(),
+        updateProductUseCase: serviceLocator.get(),
+      ),
     );
   }
 }
