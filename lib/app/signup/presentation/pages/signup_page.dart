@@ -1,177 +1,197 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:storeapp/app/di/dependency_injection.dart';
+import 'package:storeapp/app/signup/presentation/bloc/signup_bloc.dart';
+import 'package:storeapp/app/signup/presentation/bloc/signup_event.dart';
+import 'package:storeapp/app/signup/presentation/bloc/signup_state.dart';
 
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});
-  /*
-nombre del usuario
-correo
-pasuor 2 veces para validarla
-url de imagen
-botoncito de crear usuario 
-*/
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          SignUpHeaderWidget(),
-          SignUpBodyWidget(),
-          SignUpFooterWidget(),
-        ],
-      ),
+    return BlocProvider.value(
+      value: DependencyInjection.serviceLocator.get<SignupBloc>(),
+      child: Scaffold(resizeToAvoidBottomInset: false, body: SignupLogin()),
     );
   }
 }
 
-class SignUpFooterWidget extends StatelessWidget {
-  const SignUpFooterWidget({
-    super.key,
-  });
+class SignupLogin extends StatelessWidget {
+  const SignupLogin({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(
-          right: 32.0,
-          left: 32.0,
-          top: 30.0,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/background.jpg'),
+          fit: BoxFit.cover,
         ),
+      ),
       child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FilledButton(
-              onPressed: () => {},
-              child: SizedBox(
-                child: Text("Iniciar sesion", textAlign: TextAlign.center),
-              ),
-            ),
-            SizedBox(width: 16.0),
-            OutlinedButton(
-              //onPressed: () => context.pop(), ambos son validos
-              onPressed: () => GoRouter.of(context).pop(),
-              child: SizedBox(
-                child: Text("Navegar al login", textAlign: TextAlign.center),
-              ),
-            ),
-          ],
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 25.0),
+          padding: const EdgeInsets.all(10.0),
+          width: MediaQuery.of(context).size.width * 0.8,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: SignUpRegistro(),
         ),
       ),
     );
   }
 }
 
-class SignUpBodyWidget extends StatefulWidget {
-  const SignUpBodyWidget({super.key});
+class SignUpRegistro extends StatefulWidget {
+  const SignUpRegistro({super.key});
 
   @override
-  State<SignUpBodyWidget> createState() => _SignUpBodyWidgetState();
+  State<SignUpRegistro> createState() => _SignUpRegistroState();
 }
 
-class _SignUpBodyWidgetState extends State<SignUpBodyWidget> {
-  bool showPassword = false;
-  bool showConfirmPassword = false;
+class _SignUpRegistroState extends State<SignUpRegistro> {
+  String urlImagen = '';
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(
-          right: 32.0,
-          left: 32.0,
-          top: 30.0,
-        ),
-      child: Column(
-        children: [
-          Image.network(
-            "https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
-            width: double.infinity,
-            height: 100.0,
-            fit: BoxFit.contain,
-          ),
-          SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              labelText: "Nombre:",
-              icon: Icon(Icons.person),
-              hintText: "Escriba su nombre",
-            ),
-            keyboardType: TextInputType.name,
-          ),
-          SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              labelText: "email:",
-              icon: Icon(Icons.email),
-              hintText: "Escriba su email",
-            ),
-            keyboardType: TextInputType.emailAddress,
-          ), //email
-          SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              labelText: "pasuor:",
-              icon: Icon(Icons.lock),
-              hintText: "Escriba su password",
-              suffixIcon: GestureDetector(
-                onTap:
-                    () => setState(() {
-                      showPassword = !showPassword;
-                    }),
-                child: Icon(
-                  showPassword ? Icons.visibility : Icons.visibility_off,
-                ),
-              ),
-            ),
-            obscureText: !showPassword,
-          ),
-          SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              labelText: "Confirma la pasuor:",
-              icon: Icon(Icons.lock),
-              hintText: "Escriba su password",
-              suffixIcon: GestureDetector(
-                onTap:
-                    () => setState(() {
-                      showConfirmPassword = !showConfirmPassword;
-                    }),
-                child: Icon(
-                  showConfirmPassword ? Icons.visibility : Icons.visibility_off,
-                ),
-              ),
-            ),
-            obscureText: !showConfirmPassword,
-          ),
-          SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              labelText: "URL de imagen:",
-              icon: Icon(Icons.image),
-              hintText: "Digita el enlace de tu imagen",
-            ),
-            keyboardType: TextInputType.url,
-          ),
-          SizedBox(height: 16.0),
-        ],
-      ),
-    );
-  }
-}
+    final bloc = context.read<SignupBloc>();
+    TextEditingController nameUserField = TextEditingController();
+    TextEditingController emailUserField = TextEditingController();
+    TextEditingController passwordUserField = TextEditingController();
+    TextEditingController imageUserField = TextEditingController();
 
-class SignUpHeaderWidget extends StatelessWidget {
-  const SignUpHeaderWidget({super.key});
+    return BlocListener<SignupBloc, SignupState>(
+      listener: (context, state) {
+        switch (state) {
+          case InitialState() || DataUpdateState():
+            break;
+          case SubmitSuccessState():
+            GoRouter.of(context).pop();
+            break;
+          case SubmitErrorState():
+            showDialog(
+              context: context,
+              builder:
+                  (BuildContext context) => AlertDialog(
+                    title: const Text('Error'),
+                    content: Text(state.message),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'OK'),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+            );
+            break;
+        }
+      },
+      child: BlocBuilder<SignupBloc, SignupState>(
+        builder: (context, state) {
+          nameUserField.text = state.model.name;
+          emailUserField.text = state.model.email;
+          passwordUserField.text = state.model.password;
+          imageUserField.text = state.model.image;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(
-          right: 32.0,
-          left: 32.0,
-          top: 10.0,
-        ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text("Pagina de registro", style: TextStyle(fontSize: 48.0))],
+          return Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 70.0,
+                  backgroundImage: NetworkImage(urlImagen),
+                ),
+                SizedBox(height: 40.0),
+                TextFormField(
+                  controller: nameUserField,
+                  onChanged:
+                      (value) => bloc.add(UserNameChangedEvent(name: value)),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: InputDecoration(
+                    labelText: "Usuario:",
+                    icon: Icon(Icons.person_rounded),
+                    hintText: "Escriba su usuario",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 30.0),
+                TextFormField(
+                  controller: emailUserField,
+                  onChanged:
+                      (value) => bloc.add(UserEmailChangedEvent(email: value)),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: InputDecoration(
+                    labelText: "Email:",
+                    icon: Icon(Icons.email_outlined),
+                    hintText: "Escriba su email",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 30.0),
+                TextFormField(
+                  controller: passwordUserField,
+                  onChanged:
+                      (value) =>
+                          bloc.add(UserPasswordChangedEvent(password: value)),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: "Contraseña:",
+                    icon: Icon(Icons.lock),
+                    hintText: "Escriba su contraseña",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                SizedBox(height: 30.0),
+                TextFormField(
+                  controller: imageUserField,
+                  onChanged: (value) {
+                    bloc.add(UserUrlImageChangedEvent(image: value));
+                    setState(() {
+                      urlImagen = value;
+                    });
+                  },
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: InputDecoration(
+                    labelText: "Imagen:",
+                    icon: Icon(Icons.image),
+                    hintText: "Ingrese la URL de imagen",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                SizedBox(height: 30.0),
+                FilledButton(
+                  onPressed: () => {bloc.add(UserSubmitEvent())},
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.blue[900],
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text("Registrarse", textAlign: TextAlign.center),
+                  ),
+                ),
+                SizedBox(height: 30.0),
+                GestureDetector(
+                  child: Text(
+                    "Ya tengo una Cuenta",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.blue,
+                    ),
+                  ),
+                  onTap: () => GoRouter.of(context).pushNamed("login"),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
