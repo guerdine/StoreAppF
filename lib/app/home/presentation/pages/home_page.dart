@@ -25,9 +25,37 @@ class HomePage extends StatelessWidget {
             onPressed: () => GoRouter.of(context).pushNamed("form-product"),
             child: Icon(Icons.add),
           ),
+          bottomNavigationBar: UserListButtonWidget()
         ),
       ),
     );
+  }
+}
+
+class UserListButtonWidget extends StatelessWidget {
+  const UserListButtonWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+     shape: CircularNotchedRectangle(), // Hace espacio para el FAB
+     notchMargin: 8.0,
+     child: Row(
+       mainAxisAlignment: MainAxisAlignment.spaceAround,
+       children: [
+         IconButton(
+           icon: Icon(Icons.shopping_bag_rounded),
+           onPressed: () => GoRouter.of(context).go("/"),
+         ),
+         IconButton(
+           icon: Icon(Icons.people_rounded),
+           onPressed: () => GoRouter.of(context).go("/user-detail"),
+         ),
+       ],
+     ),
+             );
   }
 }
 

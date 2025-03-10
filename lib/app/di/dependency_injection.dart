@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:storeapp/app/core/data/remote/service/product_service.dart';
+import 'package:storeapp/app/core/data/remote/service/user_service.dart';
 import 'package:storeapp/app/core/data/repository/session_repository_impl.dart';
 import 'package:storeapp/app/core/domain/repository/session_repository.dart';
 import 'package:storeapp/app/core/domain/use_case/logout_use_case.dart';
@@ -19,6 +20,14 @@ import 'package:storeapp/app/login/data/repository/login_repository_impl.dart';
 import 'package:storeapp/app/login/domain/repository/login_repository.dart';
 import 'package:storeapp/app/login/domain/use_case/login_use_case.dart';
 import 'package:storeapp/app/login/presentation/bloc/login_bloc.dart';
+import 'package:storeapp/app/signup/data/repository/sign_up_repository_impl.dart';
+import 'package:storeapp/app/signup/domain/repository/signup_repository.dart';
+import 'package:storeapp/app/signup/domain/use_case/add_user_use_case.dart';
+import 'package:storeapp/app/signup/presentation/bloc/signup_bloc.dart';
+import 'package:storeapp/app/user_detail/data/repository/user_detail_repository_impl.dart';
+import 'package:storeapp/app/user_detail/domain/repository/user_detail_repository.dart';
+import 'package:storeapp/app/user_detail/domain/use_case/get_users_use_case.dart';
+import 'package:storeapp/app/user_detail/presentation/bloc/user_detail_bloc.dart';
 
 final class DependencyInjection {
   DependencyInjection._();
@@ -91,5 +100,37 @@ final class DependencyInjection {
         updateProductUseCase: serviceLocator.get(),
       ),
     );
+
+    //user-detail
+    serviceLocator.registerFactory<UserService>(
+       () => UserService(dio: serviceLocator.get()),
+     );
+
+    serviceLocator.registerFactory<UserDetailRepository>(
+       () => UserDetailRepositoryImpl(userService: serviceLocator.get()),
+     );
+     serviceLocator.registerFactory<GetUsersUseCase>(
+       () => GetUsersUseCase(homeAccountRepository: serviceLocator.get()),
+     );
+     serviceLocator.registerFactory<UserDetailBloc>(
+       () => UserDetailBloc(
+         getUsersUseCase: serviceLocator.get(),
+         logoutUseCase: serviceLocator.get(),
+       ),
+     ); 
+
+     //signup
+     serviceLocator.registerFactory<SignupRepository>(
+       () => SignupRepositoryImpl(userService: serviceLocator.get()),
+     );
+     serviceLocator.registerFactory<AddUserUseCase>(
+       () => AddUserUseCase(signupRepository: serviceLocator.get()),
+     );
+     serviceLocator.registerFactory<SignupBloc>(
+       () => SignupBloc(
+         addUserUseCase: serviceLocator.get(),
+         //getUserUseCase: serviceLocator.get(),
+       ),
+     );
   }
 }
