@@ -55,39 +55,58 @@ class SignUpRegistro extends StatefulWidget {
 }
 
 class _SignUpRegistroState extends State<SignUpRegistro> {
+  late TextEditingController nameUserField;
+  late TextEditingController emailUserField;
+  late TextEditingController passwordUserField;
+  late TextEditingController imageUserField;
   String urlImagen = '';
+
+  @override
+  void initState() {
+    super.initState();
+    nameUserField = TextEditingController();
+    emailUserField = TextEditingController();
+    passwordUserField = TextEditingController();
+    imageUserField = TextEditingController();
+
+    imageUserField.addListener(() {
+      setState(() {
+        urlImagen = imageUserField.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    nameUserField.dispose();
+    emailUserField.dispose();
+    passwordUserField.dispose();
+    imageUserField.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SignupBloc>();
-    TextEditingController nameUserField = TextEditingController();
-    TextEditingController emailUserField = TextEditingController();
-    TextEditingController passwordUserField = TextEditingController();
-    TextEditingController imageUserField = TextEditingController();
 
     return BlocListener<SignupBloc, SignupState>(
       listener: (context, state) {
-        switch (state) {
-          case InitialState() || DataUpdateState():
-            break;
-          case SubmitSuccessState():
-            GoRouter.of(context).pop();
-            break;
-          case SubmitErrorState():
-            showDialog(
-              context: context,
-              builder:
-                  (BuildContext context) => AlertDialog(
-                    title: const Text('Error'),
-                    content: Text(state.message),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, 'OK'),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-            );
-            break;
+        if (state is SubmitSuccessState) {
+          GoRouter.of(context).pop();
+        } else if (state is SubmitErrorState) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Error'),
+              content: Text(state.message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
         }
       },
       child: BlocBuilder<SignupBloc, SignupState>(
@@ -103,18 +122,23 @@ class _SignUpRegistroState extends State<SignUpRegistro> {
               children: [
                 CircleAvatar(
                   radius: 70.0,
-                  backgroundImage: NetworkImage(urlImagen),
+                  backgroundImage: urlImagen.isNotEmpty
+                      ? NetworkImage(urlImagen)
+                      : AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                  onBackgroundImageError: (_, __) {
+                    setState(() {
+                      urlImagen = '';
+                    });
+                  },
                 ),
                 SizedBox(height: 40.0),
                 TextFormField(
                   controller: nameUserField,
-                  onChanged:
-                      (value) => bloc.add(UserNameChangedEvent(name: value)),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onChanged: (value) => bloc.add(UserNameChangedEvent(name: value)),
                   decoration: InputDecoration(
-                    labelText: "Usuario:",
+                    labelText: "Nombre:",
                     icon: Icon(Icons.person_rounded),
-                    hintText: "Escriba su usuario",
+                    hintText: "Escriba su nombre",
                     hintStyle: TextStyle(color: Colors.grey),
                   ),
                   keyboardType: TextInputType.emailAddress,
@@ -122,9 +146,7 @@ class _SignUpRegistroState extends State<SignUpRegistro> {
                 SizedBox(height: 30.0),
                 TextFormField(
                   controller: emailUserField,
-                  onChanged:
-                      (value) => bloc.add(UserEmailChangedEvent(email: value)),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onChanged: (value) => bloc.add(UserEmailChangedEvent(email: value)),
                   decoration: InputDecoration(
                     labelText: "Email:",
                     icon: Icon(Icons.email_outlined),
@@ -136,10 +158,7 @@ class _SignUpRegistroState extends State<SignUpRegistro> {
                 SizedBox(height: 30.0),
                 TextFormField(
                   controller: passwordUserField,
-                  onChanged:
-                      (value) =>
-                          bloc.add(UserPasswordChangedEvent(password: value)),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onChanged: (value) => bloc.add(UserPasswordChangedEvent(password: value)),
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Contraseña:",
@@ -153,11 +172,7 @@ class _SignUpRegistroState extends State<SignUpRegistro> {
                   controller: imageUserField,
                   onChanged: (value) {
                     bloc.add(UserUrlImageChangedEvent(image: value));
-                    setState(() {
-                      urlImagen = value;
-                    });
                   },
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: InputDecoration(
                     labelText: "Imagen:",
                     icon: Icon(Icons.image),
@@ -167,10 +182,8 @@ class _SignUpRegistroState extends State<SignUpRegistro> {
                 ),
                 SizedBox(height: 30.0),
                 FilledButton(
-                  onPressed: () => {bloc.add(UserSubmitEvent())},
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.blue[900],
-                  ),
+                  onPressed: () => bloc.add(UserSubmitEvent()),
+                  style: FilledButton.styleFrom(backgroundColor: const Color.fromARGB(255, 174, 115, 13)),
                   child: SizedBox(
                     width: double.infinity,
                     child: Text("Registrarse", textAlign: TextAlign.center),
@@ -181,9 +194,9 @@ class _SignUpRegistroState extends State<SignUpRegistro> {
                   child: Text(
                     "Ya tengo una Cuenta",
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: Color.fromARGB(255, 170, 33, 243),
                       decoration: TextDecoration.underline,
-                      decorationColor: Colors.blue,
+                      decorationColor: const Color.fromARGB(255, 170, 33, 243),
                     ),
                   ),
                   onTap: () => GoRouter.of(context).pushNamed("login"),

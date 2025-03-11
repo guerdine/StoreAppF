@@ -10,14 +10,12 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
  
    SignupBloc({
      required this.addUserUseCase,
-     //required this.getUserUseCase,
    }) : super(InitialState()) {
      on<UserNameChangedEvent>(_userNameChangedEvent);
      on<UserEmailChangedEvent>(_userEmailChangedEvent);
      on<UserPasswordChangedEvent>(_userPasswordChangedEvent);
      on<UserUrlImageChangedEvent>(_userUrlImageChangedEvent);
      on<UserSubmitEvent>(_userSubmitEvent);
-     //on<GetUserEvent>(_getUserEvent);
    }
  
    void _userNameChangedEvent(
@@ -91,13 +89,4 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
  
      emit(newState);
    }
- 
-   /*void _getUserEvent(
-     GetUserUseCase event,
-     Emitter<SignupState> emit,
-   ) async {
-     final result = await getUserUseCase.invoke(event.id);
-     final newState = DataUpdateState(model: result);
-     emit(newState);
-   }*/
  }

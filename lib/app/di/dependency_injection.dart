@@ -110,7 +110,7 @@ final class DependencyInjection {
        () => UserDetailRepositoryImpl(userService: serviceLocator.get()),
      );
      serviceLocator.registerFactory<GetUsersUseCase>(
-       () => GetUsersUseCase(homeAccountRepository: serviceLocator.get()),
+       () => GetUsersUseCase(userDetailRepository: serviceLocator.get()),
      );
      serviceLocator.registerFactory<UserDetailBloc>(
        () => UserDetailBloc(

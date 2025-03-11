@@ -39,7 +39,7 @@ final class UserService {
      late final UserDataModel user;
      try {
        final Response<Map<String, dynamic>> response = await dio.get(
-         "$_baseUrl/produ /$id.json",
+         "$_baseUrl/users/$id.json",
        );
        if (response.data != null) {
          user = UserDataModel.fromJson(id, response.data!);

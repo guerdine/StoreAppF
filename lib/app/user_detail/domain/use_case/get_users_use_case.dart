@@ -2,15 +2,15 @@ import 'package:storeapp/app/user_detail/domain/repository/user_detail_repositor
 import 'package:storeapp/app/user_detail/presentation/model/user_model.dart';
 
 class GetUsersUseCase {
-   final UserDetailRepository homeAccountRepository;
+   final UserDetailRepository userDetailRepository;
  
-   GetUsersUseCase({required this.homeAccountRepository});
+   GetUsersUseCase({required this.userDetailRepository});
  
    Future <List<UserModel>> invoke() async{
      final List<UserModel> users = [];
  
      try {
-         final result = await homeAccountRepository.getUsers();
+         final result = await userDetailRepository.getUsers();
      for (var element in result) {
        users.add(element.toUserModel());
      }  

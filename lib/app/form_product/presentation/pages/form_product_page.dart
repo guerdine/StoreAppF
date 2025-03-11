@@ -96,7 +96,6 @@ class _BodyLoginWidgetState extends State<BodyLoginWidget> with LoginMixin {
                         icon: Icon(Icons.card_giftcard),
                         hintText: "Escribe el nombre del producto",
                       ),
-                      keyboardType: TextInputType.emailAddress,
                     ),
                     SizedBox(height: 32.0),
                     TextFormField(
